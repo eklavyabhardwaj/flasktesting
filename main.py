@@ -1,6 +1,5 @@
 from flask import Flask, render_template
-from splinter import Browser
-import time
+from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
 
@@ -13,23 +12,35 @@ def test_login():
     email_id = 'slaadmin'
     password = 'slaadmin@123'
 
-    # Set up Splinter with Chrome browser
-    with Browser('chrome') as browser:
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        context = browser.new_context()
+
         # Navigate to the ERP login page
-        browser.visit('https://erp.electrolabgroup.com/login#login')
+        page = context.new_page()
+        page.goto('https://erp.electrolabgroup.com/login#login')
 
         # Enter login credentials
-        browser.find_by_xpath('//*[@id="login_email"]').fill(email_id)
-        browser.find_by_xpath('//*[@id="login_password"]').fill(password)
+        email_input = page.wait_for_selector('//*[@id="login_email"]')
+        email_input.type(email_id)
+
+        password_input = page.wait_for_selector('//*[@id="login_password"]')
+        password_input.type(password)
 
         # Find the login button and click it
-        browser.find_by_xpath('//*[@id="page-login"]/div/main/div[2]/div/section[1]/div[1]/form/div[2]/button').click()
+        login_button = page.wait_for_selector(
+            '//*[@id="page-login"]/div/main/div[2]/div/section[1]/div[1]/form/div[2]/button', timeout=10000)
+
+        login_button.click()
 
         # Wait for the login process to complete (you may need to adjust this)
-        time.sleep(5)
+        page.wait_for_timeout(5000)
 
         # You can add further logic to verify that the login was successful.
         # For example, you can check if the user is redirected to the expected page.
+
+        # Close the browser
+        context.close()
 
     return "Login Test Completed"
 
