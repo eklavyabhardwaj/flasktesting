@@ -99,9 +99,9 @@ def download_file():
         driver.quit()
 
     # Assuming the file is downloaded to the current working directory with a specific name
-    #file_path = os.path.join(os.getcwd(), 'downloaded_file.txt')
+    file_path = os.path.join(os.getcwd(), 'downloaded_file.txt')
 
-    #return send_file(file_path, as_attachment=True)
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port = 8000, debug=True)
