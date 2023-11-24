@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -14,8 +14,8 @@ app = Flask(__name__)
 def index():
     return render_template('index_with_download.html')
 
-@app.route('/download_file')
-def download_file():
+@app.route('/test_login')
+def test_login():
     email_id = 'slaadmin'
     password = 'slaadmin@123'
 
@@ -25,11 +25,6 @@ def download_file():
     #chrome_options.add_argument('--disable-gpu')  # May be required in headless mode
     chrome_options.add_argument('--window-size=1920x1080')  # Adjust the size as needed
     chrome_options.add_argument('--disable-software-rasterizer')  # Add this line
-
-    # Specify the download directory as the program folder
-    program_folder = os.path.dirname(os.path.abspath(__file__))
-    download_dir = os.path.join(program_folder, 'downloads')
-    chrome_options.add_argument(f'--download-path={download_dir}')
 
     # Initialize the Selenium WebDriver with Chrome options
     driver = webdriver.Chrome(options=chrome_options)
@@ -52,56 +47,17 @@ def download_file():
                                            '//*[@id="page-login"]/div/main/div[2]/div/section[1]/div[1]/form/div[2]/button')
         login_button.click()
 
-        time.sleep(3)
-
-        # Navigate to the ISSUE_SLA report page
-        quotation_report_url = 'https://erp.electrolabgroup.com/app/issue/view/report/Issue%20SLA%20T2023'
-        driver.get(quotation_report_url)
-
-        # Find the menu option and click on it to expand the menu
-        menu_option = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH,
-             '//*[@id="page-List/Issue/Report/Issue SLA T2023"]/div[1]/div/div/div[2]/div[2]/div[1]/button')))
-        menu_option.click()
-
-        # Wait for the menu to expand and show the dropdown options (you may need to adjust this)
-        time.sleep(2)
-
-        # Find the dropdown menu with the Export option and click on it
-        export_option_dropdown = driver.find_element(By.XPATH,
-                                                     '//*[@id="page-List/Issue/Report/Issue SLA T2023"]/div[1]/div/div/div[2]/div[2]/div[1]/ul/li[6]/a')
-        export_option_dropdown.click()
-
-        # Wait for the Export option to be visible in the dropdown menu (you may need to adjust this)
-        time.sleep(2)
-
-        # Find the "Export All" checkbox and click on it
-        export_all_checkbox = driver.find_element(By.XPATH,
-                                                  '//span[contains(@class, "label-area") and contains(text(), "Export All")]//preceding-sibling::span[@class="input-area"]//input[@type="checkbox"]')
-        export_all_checkbox.click()
-
-        # Find the Download button and click on it
-        download_button = driver.find_element(By.XPATH, '//button[contains(text(), "Download")]')
-        download_button.click()
-
-        # Wait for the download to complete (you may need to adjust this)
-        time.sleep(10)
-
-
-        # Wait for the file to download (you may need to adjust the sleep time)
+        # Wait for the login process to complete (you may need to adjust this)
         time.sleep(5)
 
-        # You can add further logic to verify the file is downloaded successfully
-        # For example, you can check the presence of the downloaded file in a specific directory.
+        # You can add further logic to verify that the login was successful.
+        # For example, you can check if the user is redirected to the expected page.
 
     finally:
         # Close the WebDriver
         driver.quit()
 
-    # Assuming the file is downloaded to the current working directory with a specific name
-    file_path = os.path.join(os.getcwd(), 'downloaded_file.txt')
-
-    return send_file(file_path, as_attachment=True)
+    return "Login Test Completed"
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001)
